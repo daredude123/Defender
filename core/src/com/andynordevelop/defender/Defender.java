@@ -19,12 +19,14 @@ public class Defender extends ApplicationAdapter {
 	World world;
 	OrthographicCamera camera;
 	Box2DDebugRenderer debugRenderer;
+	Player player;
 
 	@Override
 	public void create () {
 		world = new World(new Vector2(0, -10), true);
 		camera = new OrthographicCamera(50, 25);
 		debugRenderer = new Box2DDebugRenderer();
+		initPlayer();
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -23, -10f, 23, -10f, 5);
@@ -43,7 +45,13 @@ public class Defender extends ApplicationAdapter {
 			@Override
 			public boolean touchUp(int x, int y, int pointer, int button) {
 
+
+				//shoot a cannonball towards point
+				CannonBall cannonBall = new CannonBall();
+				cannonBall.initbody(world, -23f, 0f, 0.3f, 2);
+
 				Body body = createCircle(BodyDef.BodyType.DynamicBody, -23f, 0f, 0.3f, 2);
+
 				long currentTime = System.nanoTime();
 				long measuredTime = (currentTime - startTime)/10000000;
 				System.out.println("time = " +measuredTime);
@@ -70,6 +78,11 @@ public class Defender extends ApplicationAdapter {
 				return true;
 			}
 		});
+	}
+
+	private void initPlayer() {
+		Vector2 position = new Vector2(-23f, 0f);
+		player = new Player(position);
 	}
 
 	@Override
