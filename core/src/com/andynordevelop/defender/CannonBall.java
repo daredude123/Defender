@@ -11,8 +11,10 @@ public class CannonBall {
     BodyDef cannonBallBodyDef;
     final BodyDef.BodyType cannonBallBodyType = BodyDef.BodyType.DynamicBody;
     Vector2 cannonBallPosition;
+    World world;
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
+        this.world = world;
         cannonBallPosition = new Vector2();
         cannonBallBodyDef = new BodyDef();
         cannonBallBodyDef.type = cannonBallBodyType;
@@ -22,9 +24,13 @@ public class CannonBall {
         circleShape.setRadius(radius);
 
         cannonBallBody.createFixture(circleShape, density);
-        cannonBallBody.setTransform(startPosX, startPosY,0);
+        cannonBallBody.setTransform(startPosX, startPosY, 0);
 
         circleShape.dispose();
+    }
+
+    public void destroyCannonBall() {
+        world.destroyBody(cannonBallBody);
     }
 
     Vector2 getPosition() {
@@ -33,5 +39,37 @@ public class CannonBall {
 
     public void setPosition(Vector2 newPos) {
         cannonBallPosition = newPos;
+    }
+
+    public Body getCannonBallBody() {
+        return cannonBallBody;
+    }
+
+    public void setCannonBallBody(Body cannonBallBody) {
+        this.cannonBallBody = cannonBallBody;
+    }
+
+    public BodyDef getCannonBallBodyDef() {
+        return cannonBallBodyDef;
+    }
+
+    public void setCannonBallBodyDef(BodyDef cannonBallBodyDef) {
+        this.cannonBallBodyDef = cannonBallBodyDef;
+    }
+
+    public BodyDef.BodyType getCannonBallBodyType() {
+        return cannonBallBodyType;
+    }
+
+    public Vector2 getCannonBallPosition() {
+        return cannonBallPosition;
+    }
+
+    public void setCannonBallPosition(Vector2 cannonBallPosition) {
+        this.cannonBallPosition = cannonBallPosition;
+    }
+
+    public void shoot(float forcex, float forcey, float x, float y, boolean b) {
+        cannonBallBody.applyForce(forcex ,forcey ,x , y, b);
     }
 }

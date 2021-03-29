@@ -25,8 +25,10 @@ public class Defender extends ApplicationAdapter {
 	public void create () {
 		world = new World(new Vector2(0, -10), true);
 		camera = new OrthographicCamera(50, 25);
+		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
 		initPlayer();
+		spawnEnemies();
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -23, -10f, 23, -10f, 5);
@@ -50,25 +52,26 @@ public class Defender extends ApplicationAdapter {
 				CannonBall cannonBall = new CannonBall();
 				cannonBall.initbody(world, -23f, 0f, 0.3f, 2);
 
-				Body body = createCircle(BodyDef.BodyType.DynamicBody, -23f, 0f, 0.3f, 2);
+//				Body body = createCircle(BodyDef.BodyType.DynamicBody, -23f, 0f, 0.3f, 2);
 
 				long currentTime = System.nanoTime();
 				long measuredTime = (currentTime - startTime)/10000000;
-				System.out.println("time = " +measuredTime);
 
-				Vector2 bodyposition = new Vector2(body.getPosition());
+				Vector2 bodyposition = new Vector2(player.getPosition());
 
 				Vector2 userTouch = getMousePosInGameWorld(x, y);
+
 				float velx = userTouch.x - bodyposition.x;
 				float vely = userTouch.y - bodyposition.y;
 
 				if (y < bodyposition.y) {
 					vely = 0- y;
 				}
-				System.out.println("y :" + vely);
-				System.out.println("x :" + velx);
-				body.applyForce(velx*measuredTime, vely*measuredTime,bodyposition.x,bodyposition.y,true);
 
+				float forcex = velx*measuredTime;
+				float forcey = vely*measuredTime;
+
+				cannonBall.shoot(forcex, forcey, player.position.x, player.position.y, true);
 				return true;
 			}
 
@@ -78,6 +81,11 @@ public class Defender extends ApplicationAdapter {
 				return true;
 			}
 		});
+	}
+
+	private void spawnEnemies() {
+		Enemy enemy = new Enemy();
+
 	}
 
 	private void initPlayer() {
