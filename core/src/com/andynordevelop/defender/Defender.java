@@ -15,18 +15,26 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import java.util.ArrayList;
+
 public class Defender extends ApplicationAdapter {
 	World world;
 	OrthographicCamera camera;
 	Box2DDebugRenderer debugRenderer;
 	Player player;
+	ArrayList<Enemy> enemyList;
+	ArrayList<CannonBall> cannonBallList;
+	int worldWidth = 50;
+	int worldHeight = 25;
 
 	@Override
 	public void create () {
 		world = new World(new Vector2(0, -10), true);
-		camera = new OrthographicCamera(50, 25);
+		camera = new OrthographicCamera(worldWidth, worldHeight);
 		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
+		enemyList = new ArrayList<>();
+		cannonBallList = new ArrayList<>();
 		initPlayer();
 		spawnEnemies();
 
@@ -46,7 +54,6 @@ public class Defender extends ApplicationAdapter {
 
 			@Override
 			public boolean touchUp(int x, int y, int pointer, int button) {
-
 
 				//shoot a cannonball towards point
 				CannonBall cannonBall = new CannonBall();
@@ -85,7 +92,8 @@ public class Defender extends ApplicationAdapter {
 
 	private void spawnEnemies() {
 		Enemy enemy = new Enemy();
-
+		enemy.initBody(world, worldWidth/2,0,3,5);
+		enemyList.add(enemy);
 	}
 
 	private void initPlayer() {
@@ -100,6 +108,20 @@ public class Defender extends ApplicationAdapter {
 
 		debugRenderer.render(world, camera.combined);
 		world.step(1 / 60f, 10, 2);
+
+		moveEnemies();
+	}
+
+	private void moveEnemies() {
+		for (Enemy x : enemyList) {
+			System.out.println(x.getEnemyBody().getPosition());
+			x.getEnemyBody().setLinearVelocity(-10, 0);
+			if (x.getEnemyPosition().x - x.radius < (-worldHeight)) {
+				System.out.println("crash");
+				world.destroyBody(x.enemyBody);
+			}
+		}
+
 	}
 
 	@Override

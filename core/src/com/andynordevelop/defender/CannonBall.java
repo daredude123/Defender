@@ -15,7 +15,7 @@ public class CannonBall {
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
         this.world = world;
-        cannonBallPosition = new Vector2();
+        cannonBallPosition = new Vector2(startPosX, startPosY);
         cannonBallBodyDef = new BodyDef();
         cannonBallBodyDef.type = cannonBallBodyType;
         cannonBallBody = world.createBody(cannonBallBodyDef);
@@ -25,7 +25,7 @@ public class CannonBall {
 
         cannonBallBody.createFixture(circleShape, density);
         cannonBallBody.setTransform(startPosX, startPosY, 0);
-
+        cannonBallPosition = cannonBallBody.getPosition();
         circleShape.dispose();
     }
 
