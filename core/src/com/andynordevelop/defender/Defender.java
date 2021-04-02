@@ -118,13 +118,32 @@ public class Defender extends ApplicationAdapter {
 			} else if (x.cannonBallBody.getPosition().x + x.radius > worldWidth) {
 				cannonBallListToRemove.add(x);
 			}
+			for (Enemy enemy : enemyList) {
+				if (checkForCannonBallHit(x, enemy)) {
+					System.out.println("Bang");
+					enemyListToRemove.add(enemy);
+				}
+			}
 		}
+		
+		
+		
 
+		//todo: check for collision
 
 
 		moveEnemies();
 		cleanCannonBalls();
 		cleanEnemies();
+	}
+
+	private boolean checkForCannonBallHit(CannonBall x, Enemy enemy) {
+		float xD = x.getCannonBallBody().getPosition().x - enemy.getEnemyBody().getPosition().x;      // delta x
+		float yD = x.getCannonBallBody().getPosition().y - enemy.getEnemyBody().getPosition().y;      // delta y
+		float sqDist = xD * xD + yD * yD;  // square distance
+		boolean collision = sqDist <= (x.radius+enemy.radius) * (x.radius+enemy.radius);
+
+		return collision;
 	}
 
 	private void cleanEnemies() {
@@ -146,7 +165,7 @@ public class Defender extends ApplicationAdapter {
 	private void moveEnemies() {
 		for (Enemy x : enemyList) {
 			System.out.println(x.getEnemyBody().getPosition());
-			x.getEnemyBody().setLinearVelocity(-10, 0);
+			x.getEnemyBody().setLinearVelocity(-5, 0);
 			if (x.getEnemyPosition().x - x.radius < (-worldHeight)) {
 				System.out.println("crash");
 				enemyListToRemove.add(x);
