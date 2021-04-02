@@ -121,20 +121,21 @@ public class Defender extends ApplicationAdapter {
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
 					System.out.println("Bang");
+					spawnFragments(enemy.getEnemyBody().getPosition());
 					enemyListToRemove.add(enemy);
 				}
 			}
 		}
-		
-		
-		
 
 		//todo: check for collision
-
-
 		moveEnemies();
 		cleanCannonBalls();
 		cleanEnemies();
+	}
+
+	//todo: fortsett med denne
+	private void spawnFragments(Vector2 position) {
+
 	}
 
 	private boolean checkForCannonBallHit(CannonBall x, Enemy enemy) {
