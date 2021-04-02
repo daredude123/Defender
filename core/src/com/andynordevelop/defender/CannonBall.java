@@ -12,6 +12,7 @@ public class CannonBall {
     final BodyDef.BodyType cannonBallBodyType = BodyDef.BodyType.DynamicBody;
     Vector2 cannonBallPosition;
     World world;
+    float radius;
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
         this.world = world;
@@ -19,6 +20,7 @@ public class CannonBall {
         cannonBallBodyDef = new BodyDef();
         cannonBallBodyDef.type = cannonBallBodyType;
         cannonBallBody = world.createBody(cannonBallBodyDef);
+        this.radius = radius;
 
         CircleShape circleShape = new CircleShape();
         circleShape.setRadius(radius);

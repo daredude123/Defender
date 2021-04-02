@@ -23,9 +23,11 @@ public class Defender extends ApplicationAdapter {
 	Box2DDebugRenderer debugRenderer;
 	Player player;
 	ArrayList<Enemy> enemyList;
-	ArrayList<CannonBall> cannonBallList;
+	ArrayList<CannonBall> cannonBallListToRemove;
+	ArrayList<Enemy> enemyListToRemove;
 	int worldWidth = 50;
 	int worldHeight = 25;
+	ArrayList<CannonBall> cannonBallList;
 
 	@Override
 	public void create () {
@@ -34,9 +36,11 @@ public class Defender extends ApplicationAdapter {
 		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
 		enemyList = new ArrayList<>();
+		cannonBallListToRemove = new ArrayList<>();
 		cannonBallList = new ArrayList<>();
+		enemyListToRemove = new ArrayList<>();
 		initPlayer();
-		spawnEnemies();
+		spawnEnemy();
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -23, -10f, 23, -10f, 5);
@@ -59,8 +63,6 @@ public class Defender extends ApplicationAdapter {
 				CannonBall cannonBall = new CannonBall();
 				cannonBall.initbody(world, -23f, 0f, 0.3f, 2);
 
-//				Body body = createCircle(BodyDef.BodyType.DynamicBody, -23f, 0f, 0.3f, 2);
-
 				long currentTime = System.nanoTime();
 				long measuredTime = (currentTime - startTime)/10000000;
 
@@ -79,6 +81,7 @@ public class Defender extends ApplicationAdapter {
 				float forcey = vely*measuredTime;
 
 				cannonBall.shoot(forcex, forcey, player.position.x, player.position.y, true);
+				cannonBallList.add(cannonBall);
 				return true;
 			}
 
@@ -90,9 +93,9 @@ public class Defender extends ApplicationAdapter {
 		});
 	}
 
-	private void spawnEnemies() {
+	private void spawnEnemy() {
 		Enemy enemy = new Enemy();
-		enemy.initBody(world, worldWidth/2,0,3,5);
+		enemy.initBody(world, worldWidth/2,0,0.2f,5);
 		enemyList.add(enemy);
 	}
 
@@ -109,7 +112,35 @@ public class Defender extends ApplicationAdapter {
 		debugRenderer.render(world, camera.combined);
 		world.step(1 / 60f, 10, 2);
 
+		for (CannonBall x : cannonBallList) {
+			if (x.cannonBallBody.getPosition().y > worldHeight) {
+				cannonBallListToRemove.add(x);
+			} else if (x.cannonBallBody.getPosition().x + x.radius > worldWidth) {
+				cannonBallListToRemove.add(x);
+			}
+		}
+
+
+
 		moveEnemies();
+		cleanCannonBalls();
+		cleanEnemies();
+	}
+
+	private void cleanEnemies() {
+		for (Enemy x : enemyListToRemove) {
+			world.destroyBody(x.enemyBody);
+			enemyList.remove(x);
+		}
+		enemyListToRemove.clear();
+	}
+
+	private void cleanCannonBalls() {
+		for (CannonBall x : cannonBallListToRemove) {
+			world.destroyBody(x.cannonBallBody);
+			cannonBallList.remove(x);
+		}
+		cannonBallListToRemove.clear();
 	}
 
 	private void moveEnemies() {
@@ -118,10 +149,9 @@ public class Defender extends ApplicationAdapter {
 			x.getEnemyBody().setLinearVelocity(-10, 0);
 			if (x.getEnemyPosition().x - x.radius < (-worldHeight)) {
 				System.out.println("crash");
-				world.destroyBody(x.enemyBody);
+				enemyListToRemove.add(x);
 			}
 		}
-
 	}
 
 	@Override
