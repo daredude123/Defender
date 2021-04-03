@@ -12,10 +12,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Defender extends ApplicationAdapter {
 	World world;
@@ -28,6 +32,7 @@ public class Defender extends ApplicationAdapter {
 	int worldWidth = 50;
 	int worldHeight = 25;
 	ArrayList<CannonBall> cannonBallList;
+	private boolean canSpawn;
 
 	@Override
 	public void create () {
@@ -41,9 +46,10 @@ public class Defender extends ApplicationAdapter {
 		enemyListToRemove = new ArrayList<>();
 		initPlayer();
 		spawnEnemy();
+		canSpawn = false;
 
 		// ground
-		createEdge(BodyDef.BodyType.StaticBody, -23, -10f, 23, -10f, 5);
+		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
 		createEdge(BodyDef.BodyType.StaticBody, -25,12.5f,25,12.5f,5);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
@@ -95,8 +101,13 @@ public class Defender extends ApplicationAdapter {
 
 	private void spawnEnemy() {
 		Enemy enemy = new Enemy();
-		enemy.initBody(world, worldWidth/2,0,0.2f,5);
+		enemy.initBody(world, worldWidth/2, getRandomSpawnPosition(),0.4f,5);
 		enemyList.add(enemy);
+	}
+
+	private int getRandomSpawnPosition() {
+		int rand = new Random().nextInt(25 + 25) - 25;
+		return rand;
 	}
 
 	private void initPlayer() {
@@ -109,6 +120,7 @@ public class Defender extends ApplicationAdapter {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		long elapsedTime = System.currentTimeMillis()/1000;
 		debugRenderer.render(world, camera.combined);
 		world.step(1 / 60f, 10, 2);
 
@@ -120,11 +132,13 @@ public class Defender extends ApplicationAdapter {
 			}
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
-					System.out.println("Bang");
 					spawnFragments(enemy.getEnemyBody().getPosition());
 					enemyListToRemove.add(enemy);
 				}
 			}
+		}
+		if (elapsedTime % 5 == 0 && canSpawn) {
+			spawnEnemy();
 		}
 
 		//todo: check for collision
@@ -165,7 +179,6 @@ public class Defender extends ApplicationAdapter {
 
 	private void moveEnemies() {
 		for (Enemy x : enemyList) {
-			System.out.println(x.getEnemyBody().getPosition());
 			x.getEnemyBody().setLinearVelocity(-5, 0);
 			if (x.getEnemyPosition().x - x.radius < (-worldHeight)) {
 				System.out.println("crash");
