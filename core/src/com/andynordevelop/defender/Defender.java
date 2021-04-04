@@ -12,14 +12,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Defender extends ApplicationAdapter {
 	World world;
@@ -47,7 +44,7 @@ public class Defender extends ApplicationAdapter {
 		initPlayer();
 		spawnEnemy();
 		canSpawn = false;
-
+		spawnFragments(new Vector2(0,0),0.1f,0.1f);
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
 		createEdge(BodyDef.BodyType.StaticBody, -25,12.5f,25,12.5f,5);
@@ -132,12 +129,12 @@ public class Defender extends ApplicationAdapter {
 			}
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
-					spawnFragments(enemy.getEnemyBody().getPosition());
+					spawnFragments(enemy.getEnemyBody().getPosition(),0.1f,0.1f );
 					enemyListToRemove.add(enemy);
 				}
 			}
 		}
-		if (elapsedTime % 5 == 0 && canSpawn) {
+		if (elapsedTime % 10 == 0) {
 			spawnEnemy();
 		}
 
@@ -147,9 +144,23 @@ public class Defender extends ApplicationAdapter {
 		cleanEnemies();
 	}
 
-	//todo: fortsett med denne
-	private void spawnFragments(Vector2 position) {
+	//todo: fortsett med denne, ikke helt ferdig 4 april 22:44
+	private void spawnFragments(Vector2 position, float width, float height) {
+		float startposX = position.x - (width);
+		float startposY = position.y - (height);
+		float tmp = startposX;
 
+
+		for (int i = 0; i < 3; i++) {
+			for (int y = 0; y < 3; y++) {
+				Shrapnel shrapnel = new Shrapnel();
+				shrapnel.initbody(world, tmp, startposY, width*2, height*2, 0.1f);
+				tmp += width*2;
+			}
+			tmp = startposX;
+
+			startposY -= height*2;
+		}
 	}
 
 	private boolean checkForCannonBallHit(CannonBall x, Enemy enemy) {
@@ -181,7 +192,6 @@ public class Defender extends ApplicationAdapter {
 		for (Enemy x : enemyList) {
 			x.getEnemyBody().setLinearVelocity(-5, 0);
 			if (x.getEnemyPosition().x - x.radius < (-worldHeight)) {
-				System.out.println("crash");
 				enemyListToRemove.add(x);
 			}
 		}
