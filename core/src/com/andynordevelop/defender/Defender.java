@@ -10,9 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ public class Defender extends ApplicationAdapter {
 
 		initPlayer();
 		spawnEnemy();
-//		spawnFragments(new Vector2(0,0),0.1f,0.1f);
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
@@ -129,11 +126,7 @@ public class Defender extends ApplicationAdapter {
 			}
 		}
 
-		if (elapsedTime % 10 == 0) {
-			spawnEnemy();
-		}
 
-		//todo: check for collision
 		moveEnemies();
 		cleanCannonBalls();
 		cleanEnemies();
@@ -175,6 +168,8 @@ public class Defender extends ApplicationAdapter {
 			for (int y = 0; y < 3; y++) {
 				Shrapnel shrapnel = new Shrapnel();
 				shrapnel.initbody(world, tmp, startposY, halfWidth * 2, halfHeight * 2, 0.1f);
+				//TODO: Finne bedre måte å spre de på.......
+				shrapnel.getShrapnelBody().applyForce(new Vector2(0,200), shrapnel.getShrapnelBody().getPosition(),true);
 				shrapnelList.add(shrapnel);
 				tmp += halfWidth*2;
 			}
@@ -224,20 +219,6 @@ public class Defender extends ApplicationAdapter {
 		debugRenderer.dispose();
 	}
 
-	private Body createBox(BodyDef.BodyType type, float x, float y, float width, float height, float density) {
-		PolygonShape poly = new PolygonShape();
-		poly.setAsBox(width, height);
-
-		BodyDef def = new BodyDef();
-		def.type = type;
-		Body body = world.createBody(def);
-		body.createFixture(poly, density);
-		body.setTransform(x, y, 0);
-		poly.dispose();
-
-		return body;
-	}
-
 	private Body createEdge(BodyDef.BodyType type, float x1, float y1, float x2, float y2, float density) {
 		EdgeShape poly = new EdgeShape();
 		poly.set(new Vector2(0, 0), new Vector2(x2 - x1, y2 - y1));
@@ -247,20 +228,6 @@ public class Defender extends ApplicationAdapter {
 		Body body = world.createBody(def);
 		body.createFixture(poly, density);
 		body.setTransform(x1, y1, 0);
-		poly.dispose();
-
-		return body;
-	}
-
-	private Body createCircle(BodyDef.BodyType type, float x, float y, float radius, float density) {
-		CircleShape poly = new CircleShape();
-		poly.setRadius(radius);
-
-		BodyDef def = new BodyDef();
-		def.type = type;
-		Body body = world.createBody(def);
-		body.createFixture(poly, density);
-		body.setTransform(x, y, 0);
 		poly.dispose();
 
 		return body;
