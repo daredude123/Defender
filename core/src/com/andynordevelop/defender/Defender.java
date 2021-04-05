@@ -29,7 +29,8 @@ public class Defender extends ApplicationAdapter {
 	int worldWidth = 50;
 	int worldHeight = 25;
 	ArrayList<CannonBall> cannonBallList;
-	private boolean canSpawn;
+	ArrayList<Shrapnel> shrapnelListToRemove;
+	ArrayList<Shrapnel> shrapnelList;
 
 	@Override
 	public void create () {
@@ -41,10 +42,13 @@ public class Defender extends ApplicationAdapter {
 		cannonBallListToRemove = new ArrayList<>();
 		cannonBallList = new ArrayList<>();
 		enemyListToRemove = new ArrayList<>();
+		shrapnelList = new ArrayList<>();
+		shrapnelListToRemove = new ArrayList<>();
+
 		initPlayer();
 		spawnEnemy();
-		canSpawn = false;
-		spawnFragments(new Vector2(0,0),0.1f,0.1f);
+//		spawnFragments(new Vector2(0,0),0.1f,0.1f);
+
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
 		createEdge(BodyDef.BodyType.StaticBody, -25,12.5f,25,12.5f,5);
@@ -96,22 +100,6 @@ public class Defender extends ApplicationAdapter {
 		});
 	}
 
-	private void spawnEnemy() {
-		Enemy enemy = new Enemy();
-		enemy.initBody(world, worldWidth/2, getRandomSpawnPosition(),0.4f,5);
-		enemyList.add(enemy);
-	}
-
-	private int getRandomSpawnPosition() {
-		int rand = new Random().nextInt(25 + 25) - 25;
-		return rand;
-	}
-
-	private void initPlayer() {
-		Vector2 position = new Vector2(-23f, 0f);
-		player = new Player(position);
-	}
-
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
@@ -134,6 +122,13 @@ public class Defender extends ApplicationAdapter {
 				}
 			}
 		}
+
+		for (Shrapnel x : shrapnelList) {
+			if (x.checkAliveTime() / 1000 > 3) {
+				shrapnelListToRemove.add(x);
+			}
+		}
+
 		if (elapsedTime % 10 == 0) {
 			spawnEnemy();
 		}
@@ -142,24 +137,50 @@ public class Defender extends ApplicationAdapter {
 		moveEnemies();
 		cleanCannonBalls();
 		cleanEnemies();
+		cleanShrapnels();
+	}
+
+	private void cleanShrapnels() {
+		for (Shrapnel x : shrapnelListToRemove) {
+			world.destroyBody(x.shrapnelBody);
+			shrapnelList.remove(x);
+		}
+		shrapnelListToRemove.clear();
+	}
+
+	private void spawnEnemy() {
+		Enemy enemy = new Enemy();
+		enemy.initBody(world, worldWidth/2, getRandomSpawnPosition(),0.4f,5);
+		enemyList.add(enemy);
+	}
+
+	private int getRandomSpawnPosition() {
+		int rand = new Random().nextInt(25 + 25) - 25;
+		return rand;
+	}
+
+	private void initPlayer() {
+		Vector2 position = new Vector2(-23f, 0f);
+		player = new Player(position);
 	}
 
 	//todo: fortsett med denne, ikke helt ferdig 4 april 22:44
-	private void spawnFragments(Vector2 position, float width, float height) {
-		float startposX = position.x - (width);
-		float startposY = position.y - (height);
+	private void spawnFragments(Vector2 position, float halfWidth, float halfHeight) {
+		float startposX = position.x - (halfWidth);
+		float startposY = position.y - (halfHeight);
 		float tmp = startposX;
 
 
 		for (int i = 0; i < 3; i++) {
 			for (int y = 0; y < 3; y++) {
 				Shrapnel shrapnel = new Shrapnel();
-				shrapnel.initbody(world, tmp, startposY, width*2, height*2, 0.1f);
-				tmp += width*2;
+				shrapnel.initbody(world, tmp, startposY, halfWidth * 2, halfHeight * 2, 0.1f);
+				shrapnelList.add(shrapnel);
+				tmp += halfWidth*2;
 			}
 			tmp = startposX;
 
-			startposY -= height*2;
+			startposY -= halfHeight*2;
 		}
 	}
 

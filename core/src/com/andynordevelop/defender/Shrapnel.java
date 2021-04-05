@@ -7,15 +7,17 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Shrapnel {
 
+    long aliveTime;
     BodyDef shrapnelBodyDef;
-    BodyDef.BodyType shrapnelBodyType = BodyDef.BodyType.StaticBody;
+    BodyDef.BodyType shrapnelBodyType = BodyDef.BodyType.DynamicBody;
     Body shrapnelBody;
     float width, height;
     World world;
 
 
-    //REMEMBER: setas box skal ha halv vidde og halv høyde
+    //REMEMBER: setasbox skal ha halv vidde og halv høyde
     public void initbody(World world, float startPosX, float startPosY, float width, float height, float density) {
+        aliveTime = System.currentTimeMillis();
         this.world = world;
         PolygonShape poly = new PolygonShape();
         poly.setAsBox(width, height);
@@ -31,6 +33,10 @@ public class Shrapnel {
 
         poly.dispose();
 
+    }
+
+    public long checkAliveTime() {
+        return System.currentTimeMillis() - aliveTime;
     }
 
     public BodyDef getShrapnelBodyDef() {
