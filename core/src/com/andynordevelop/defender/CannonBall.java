@@ -13,6 +13,7 @@ public class CannonBall {
     Vector2 cannonBallPosition;
     World world;
     float radius;
+    private Vector2 collisionDirection;
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
         this.world = world;
@@ -73,5 +74,13 @@ public class CannonBall {
 
     public void shoot(float forcex, float forcey, float x, float y, boolean b) {
         cannonBallBody.applyForce(forcex ,forcey ,x , y, b);
+    }
+
+    public void setCollisionDirection(Vector2 vecDirection) {
+        this.collisionDirection = vecDirection;                
+    }
+
+    public Vector2 getCollisionDirection() {
+        return collisionDirection;
     }
 }

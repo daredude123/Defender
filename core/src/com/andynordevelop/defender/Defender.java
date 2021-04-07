@@ -29,6 +29,7 @@ public class Defender extends ApplicationAdapter {
 	ArrayList<CannonBall> cannonBallList;
 	ArrayList<Shrapnel> shrapnelListToRemove;
 	ArrayList<Shrapnel> shrapnelList;
+	private float timer;
 
 	@Override
 	public void create () {
@@ -42,7 +43,7 @@ public class Defender extends ApplicationAdapter {
 		enemyListToRemove = new ArrayList<>();
 		shrapnelList = new ArrayList<>();
 		shrapnelListToRemove = new ArrayList<>();
-
+		timer = 0;
 		initPlayer();
 		spawnEnemy();
 
@@ -102,19 +103,19 @@ public class Defender extends ApplicationAdapter {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		long elapsedTime = System.currentTimeMillis()/1000;
+		timer += 1*Gdx.graphics.getDeltaTime();
 		debugRenderer.render(world, camera.combined);
 		world.step(1 / 60f, 10, 2);
 
 		for (CannonBall x : cannonBallList) {
-			if (x.cannonBallBody.getPosition().y > worldHeight) {
+			if (x.cannonBallBody.getPosition().y + x.radius > worldHeight || x.cannonBallBody.getPosition().y - x.radius < -worldHeight) {
 				cannonBallListToRemove.add(x);
-			} else if (x.cannonBallBody.getPosition().x + x.radius > worldWidth) {
+			} else if (x.cannonBallBody.getPosition().x + x.radius > worldWidth || x.cannonBallBody.getPosition().x - x.radius < -worldHeight) {
 				cannonBallListToRemove.add(x);
 			}
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
-					spawnFragments(enemy.getEnemyBody().getPosition(),0.1f,0.1f );
+					spawnFragments(x.getCollisionDirection(), enemy.getEnemyBody().getPosition(),0.1f,0.1f );
 					enemyListToRemove.add(enemy);
 				}
 			}
@@ -123,9 +124,17 @@ public class Defender extends ApplicationAdapter {
 		for (Shrapnel x : shrapnelList) {
 			if (x.checkAliveTime() / 1000 > 3) {
 				shrapnelListToRemove.add(x);
+			} else if (x.getShrapnelBody().getPosition().y > worldHeight || x.getShrapnelBody().getPosition().y < -worldHeight) {
+				shrapnelListToRemove.add(x);
+			} else if (x.getShrapnelBody().getPosition().x > worldWidth || x.getShrapnelBody().getPosition().x < -worldWidth) {
+				shrapnelListToRemove.add(x);
 			}
 		}
 
+		if (timer >= 1) {
+			spawnEnemy();
+			timer = 0;
+		}
 
 		moveEnemies();
 		cleanCannonBalls();
@@ -158,23 +167,20 @@ public class Defender extends ApplicationAdapter {
 	}
 
 	//todo: fortsett med denne, ikke helt ferdig 4 april 22:44
-	private void spawnFragments(Vector2 position, float halfWidth, float halfHeight) {
+	private void spawnFragments(Vector2 collisionDirection, Vector2 position, float halfWidth, float halfHeight) {
 		float startposX = position.x - (halfWidth);
 		float startposY = position.y - (halfHeight);
 		float tmp = startposX;
-
 
 		for (int i = 0; i < 3; i++) {
 			for (int y = 0; y < 3; y++) {
 				Shrapnel shrapnel = new Shrapnel();
 				shrapnel.initbody(world, tmp, startposY, halfWidth * 2, halfHeight * 2, 0.1f);
-				//TODO: Finne bedre måte å spre de på.......
-				shrapnel.getShrapnelBody().applyForce(new Vector2(0,200), shrapnel.getShrapnelBody().getPosition(),true);
+				shrapnel.getShrapnelBody().applyForce(collisionDirection.scl(.1f), shrapnel.getShrapnelBody().getPosition(),true);
 				shrapnelList.add(shrapnel);
 				tmp += halfWidth*2;
 			}
 			tmp = startposX;
-
 			startposY -= halfHeight*2;
 		}
 	}
@@ -184,7 +190,10 @@ public class Defender extends ApplicationAdapter {
 		float yD = x.getCannonBallBody().getPosition().y - enemy.getEnemyBody().getPosition().y;      // delta y
 		float sqDist = xD * xD + yD * yD;  // square distance
 		boolean collision = sqDist <= (x.radius+enemy.radius) * (x.radius+enemy.radius);
-
+		if (collision) {
+			Vector2 vecDirection = enemy.getEnemyBody().getPosition().sub(x.getCannonBallBody().getPosition()).nor();
+			x.setCollisionDirection(vecDirection);
+		}
 		return collision;
 	}
 
