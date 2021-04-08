@@ -26,7 +26,7 @@ public class CannonBall {
         CircleShape circleShape = new CircleShape();
         circleShape.setRadius(radius);
 
-        cannonBallBody.createFixture(circleShape, density);
+        cannonBallBody.createFixture(circleShape, density).setRestitution(0.5f);
         cannonBallBody.setTransform(startPosX, startPosY, 0);
         cannonBallPosition = cannonBallBody.getPosition();
         circleShape.dispose();

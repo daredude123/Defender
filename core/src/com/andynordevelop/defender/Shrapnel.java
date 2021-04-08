@@ -1,5 +1,6 @@
 package com.andynordevelop.defender;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -13,6 +14,7 @@ public class Shrapnel {
     Body shrapnelBody;
     float width, height;
     World world;
+    Vector2 collisionDirection;
 
 
     //REMEMBER: setasbox skal ha halv vidde og halv høyde
@@ -28,7 +30,7 @@ public class Shrapnel {
         shrapnelBodyDef = new BodyDef();
         shrapnelBodyDef.type = shrapnelBodyType;
         shrapnelBody = world.createBody(shrapnelBodyDef);
-        shrapnelBody.createFixture(poly, density);
+        shrapnelBody.createFixture(poly, density).setRestitution(0.5f);
         shrapnelBody.setTransform(startPosX, startPosY, 0);
 
         poly.dispose();
@@ -85,5 +87,13 @@ public class Shrapnel {
 
     public void setWorld(World world) {
         this.world = world;
+    }
+
+    public void setCollisionDirection(Vector2 vecDirection) {
+        this.collisionDirection = vecDirection;
+    }
+
+    public Vector2 getCollisionDirection() {
+        return collisionDirection;
     }
 }
