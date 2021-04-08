@@ -10,7 +10,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -176,7 +179,7 @@ public class Defender extends ApplicationAdapter {
 			for (int y = 0; y < 3; y++) {
 				Shrapnel shrapnel = new Shrapnel();
 				shrapnel.initbody(world, tmp, startposY, halfWidth * 2, halfHeight * 2, 0.1f);
-				shrapnel.getShrapnelBody().applyForce(collisionDirection.scl(.1f), shrapnel.getShrapnelBody().getPosition(),true);
+				shrapnel.getShrapnelBody().applyForce(collisionDirection.scl(.2f), shrapnel.getShrapnelBody().getPosition(),true);
 				shrapnelList.add(shrapnel);
 				tmp += halfWidth*2;
 			}
