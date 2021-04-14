@@ -3,17 +3,18 @@ package com.andynordevelop.defender;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -67,7 +68,6 @@ public class Defender extends ApplicationAdapter {
 			@Override
 			public boolean touchUp(int x, int y, int pointer, int button) {
 
-				//shoot a cannonball towards point
 				CannonBall cannonBall = new CannonBall();
 				cannonBall.initbody(world, -23f, 0f, 0.3f, 2);
 
@@ -75,7 +75,6 @@ public class Defender extends ApplicationAdapter {
 				long measuredTime = (currentTime - startTime)/10000000;
 
 				Vector2 bodyposition = new Vector2(player.getPosition());
-
 				Vector2 userTouch = getMousePosInGameWorld(x, y);
 
 				float velx = userTouch.x - bodyposition.x;
@@ -101,13 +100,27 @@ public class Defender extends ApplicationAdapter {
 		});
 	}
 
+	private void initBackground() {
+		ShapeRenderer shapeRenderer = new ShapeRenderer();
+		for (int i = 0; i < worldWidth; i++) {
+			for (int y = 0; y < worldHeight; y++) {
+				shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+				shapeRenderer.setColor(8/255f, 48/255f, 46/255f, 1f);
+				shapeRenderer.rect(i*50,y*50,13f,13f);
+				shapeRenderer.end();
+			}
+		}
+	}
+
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		timer += 1*Gdx.graphics.getDeltaTime();
-		debugRenderer.render(world, camera.combined);
+		initBackground();
+
+//		debugRenderer.render(world, camera.combined);
+		timer += 1 * Gdx.graphics.getDeltaTime();
 		world.step(1 / 60f, 10, 2);
 
 		for (CannonBall x : cannonBallList) {
@@ -160,8 +173,7 @@ public class Defender extends ApplicationAdapter {
 	}
 
 	private int getRandomSpawnPosition() {
-		int rand = new Random().nextInt(25 + 25) - 25;
-		return rand;
+		return new Random().nextInt(25 + 25) - 25;
 	}
 
 	private void initPlayer() {
