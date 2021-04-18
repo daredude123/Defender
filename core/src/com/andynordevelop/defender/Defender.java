@@ -69,7 +69,7 @@ public class Defender extends ApplicationAdapter {
 			public boolean touchUp(int x, int y, int pointer, int button) {
 
 				CannonBall cannonBall = new CannonBall();
-				cannonBall.initbody(world, -23f, 0f, 0.3f, 2);
+				cannonBall.initbody(world, -23f, 0f, 0.5f, 2);
 
 				long currentTime = System.nanoTime();
 				long measuredTime = (currentTime - startTime)/10000000;
@@ -81,7 +81,7 @@ public class Defender extends ApplicationAdapter {
 				float vely = userTouch.y - bodyposition.y;
 
 				if (y < bodyposition.y) {
-					vely = 0- y;
+					vely = 0-y;
 				}
 
 				float forcex = velx*measuredTime;
@@ -100,26 +100,27 @@ public class Defender extends ApplicationAdapter {
 		});
 	}
 
-	private void initBackground() {
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
-		for (int i = 0; i < worldWidth; i++) {
-			for (int y = 0; y < worldHeight; y++) {
-				shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-				shapeRenderer.setColor(8/255f, 48/255f, 46/255f, 1f);
-				shapeRenderer.rect(i*50,y*50,13f,13f);
-				shapeRenderer.end();
-			}
-		}
-	}
+//	private void initBackground() {
+//		ShapeRenderer shapeRenderer = new ShapeRenderer();
+//		shapeRenderer.setProjectionMatrix(camera.projection);
+//		for (int i = -worldWidth; i < worldWidth; i++) {
+//			for (int y = -worldHeight; y < worldHeight; y++) {
+//				shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//				shapeRenderer.setColor(8/255f, 48/255f, 46/255f, 1f);
+//				shapeRenderer.rect(i*50,y*50,13f,13f);
+//				shapeRenderer.end();
+//			}
+//		}
+//	}
 
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		initBackground();
+//		initBackground();
 
-//		debugRenderer.render(world, camera.combined);
+		debugRenderer.render(world, camera.combined);
 		timer += 1 * Gdx.graphics.getDeltaTime();
 		world.step(1 / 60f, 10, 2);
 
