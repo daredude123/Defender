@@ -1,5 +1,6 @@
 package com.andynordevelop.defender;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -7,17 +8,16 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class CannonBall {
+    Sprite sprite;
     Body cannonBallBody;
     BodyDef cannonBallBodyDef;
     final BodyDef.BodyType cannonBallBodyType = BodyDef.BodyType.DynamicBody;
-    Vector2 cannonBallPosition;
     World world;
     float radius;
     private Vector2 collisionDirection;
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
         this.world = world;
-        cannonBallPosition = new Vector2(startPosX, startPosY);
         cannonBallBodyDef = new BodyDef();
         cannonBallBodyDef.type = cannonBallBodyType;
         cannonBallBody = world.createBody(cannonBallBodyDef);
@@ -28,7 +28,6 @@ public class CannonBall {
 
         cannonBallBody.createFixture(circleShape, density).setRestitution(0.5f);
         cannonBallBody.setTransform(startPosX, startPosY, 0);
-        cannonBallPosition = cannonBallBody.getPosition();
         circleShape.dispose();
     }
 
@@ -37,11 +36,7 @@ public class CannonBall {
     }
 
     Vector2 getPosition() {
-        return cannonBallPosition;
-    }
-
-    public void setPosition(Vector2 newPos) {
-        cannonBallPosition = newPos;
+        return cannonBallBody.getPosition();
     }
 
     public Body getCannonBallBody() {
@@ -64,14 +59,6 @@ public class CannonBall {
         return cannonBallBodyType;
     }
 
-    public Vector2 getCannonBallPosition() {
-        return cannonBallPosition;
-    }
-
-    public void setCannonBallPosition(Vector2 cannonBallPosition) {
-        this.cannonBallPosition = cannonBallPosition;
-    }
-
     public void shoot(float forcex, float forcey, float x, float y, boolean b) {
         cannonBallBody.applyForce(forcex ,forcey ,x , y, b);
     }
@@ -82,5 +69,13 @@ public class CannonBall {
 
     public Vector2 getCollisionDirection() {
         return collisionDirection;
+    }
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
     }
 }

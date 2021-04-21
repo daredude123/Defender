@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Defender extends ApplicationAdapter {
+	SpriteBatch spriteBatch;
 	World world;
 	OrthographicCamera camera;
 	Box2DDebugRenderer debugRenderer;
@@ -32,9 +34,10 @@ public class Defender extends ApplicationAdapter {
 	private float timer;
 
 	@Override
-	public void create () {
+	public void create() {
 		world = new World(new Vector2(0, -0), true);
 		camera = new OrthographicCamera(worldWidth, worldHeight);
+		spriteBatch = new SpriteBatch();
 		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
 		enemyList = new ArrayList<>();
@@ -49,7 +52,7 @@ public class Defender extends ApplicationAdapter {
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
-		createEdge(BodyDef.BodyType.StaticBody, -25,12.5f,25,12.5f,5);
+		createEdge(BodyDef.BodyType.StaticBody, -25, 12.5f, 25, 12.5f, 5);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
 			@Override
@@ -68,7 +71,7 @@ public class Defender extends ApplicationAdapter {
 				cannonBall.initbody(world, -23f, 0f, 0.5f, 2);
 
 				long currentTime = System.nanoTime();
-				long measuredTime = (currentTime - startTime)/1999999;
+				long measuredTime = (currentTime - startTime) / 1999999;
 
 				Vector2 bodyposition = new Vector2(player.getPosition());
 				Vector2 userTouch = getMousePosInGameWorld(x, y);
@@ -77,11 +80,11 @@ public class Defender extends ApplicationAdapter {
 				float vely = userTouch.y - bodyposition.y;
 
 				if (y < bodyposition.y) {
-					vely = 0-y;
+					vely = 0 - y;
 				}
 
-				float forcex = velx*measuredTime;
-				float forcey = vely*measuredTime;
+				float forcex = velx * measuredTime;
+				float forcey = vely * measuredTime;
 
 				cannonBall.shoot(forcex, forcey, player.position.x, player.position.y, true);
 				cannonBallList.add(cannonBall);
@@ -89,7 +92,7 @@ public class Defender extends ApplicationAdapter {
 			}
 
 			@Override
-			public boolean touchDown (int x, int y, int pointer, int button) {
+			public boolean touchDown(int x, int y, int pointer, int button) {
 				startTime = System.nanoTime();
 				return true;
 			}
@@ -97,7 +100,7 @@ public class Defender extends ApplicationAdapter {
 	}
 
 	@Override
-	public void render () {
+	public void render() {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -113,7 +116,7 @@ public class Defender extends ApplicationAdapter {
 			}
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
-					spawnFragments(x.getCollisionDirection(), enemy.getEnemyBody().getPosition(),0.1f,0.1f );
+					spawnFragments(x.getCollisionDirection(), enemy.getEnemyBody().getPosition(), 0.05f, 0.05f);
 					enemyListToRemove.add(enemy);
 				}
 			}
@@ -150,7 +153,7 @@ public class Defender extends ApplicationAdapter {
 
 	private void spawnEnemy() {
 		Enemy enemy = new Enemy();
-		enemy.initBody(world, worldWidth/2, getRandomSpawnPosition(),0.4f,5);
+		enemy.initBody(world, worldWidth / 2, getRandomSpawnPosition(), 0.4f, 5);
 		enemyList.add(enemy);
 	}
 
@@ -169,16 +172,16 @@ public class Defender extends ApplicationAdapter {
 		float startposY = position.y - (halfHeight);
 		float tmp = startposX;
 
-		for (int i = 0; i < 3; i++) {
-			for (int y = 0; y < 3; y++) {
+		for (int i = 0; i < 5; i++) {
+			for (int y = 0; y < 5; y++) {
 				Shrapnel shrapnel = new Shrapnel();
 				shrapnel.initbody(world, tmp, startposY, halfWidth * 2, halfHeight * 2, 0.1f);
-				shrapnel.getShrapnelBody().applyForce(collisionDirection.scl(.2f), shrapnel.getShrapnelBody().getPosition(),true);
+				shrapnel.getShrapnelBody().applyForce(collisionDirection.scl(.2f), shrapnel.getShrapnelBody().getPosition(), true);
 				shrapnelList.add(shrapnel);
-				tmp += halfWidth*2;
+				tmp += halfWidth * 2;
 			}
 			tmp = startposX;
-			startposY -= halfHeight*2;
+			startposY -= halfHeight * 2;
 		}
 	}
 
@@ -186,7 +189,7 @@ public class Defender extends ApplicationAdapter {
 		float xD = x.getCannonBallBody().getPosition().x - enemy.getEnemyBody().getPosition().x;      // delta x
 		float yD = x.getCannonBallBody().getPosition().y - enemy.getEnemyBody().getPosition().y;      // delta y
 		float sqDist = xD * xD + yD * yD;  // square distance
-		boolean collision = sqDist <= (x.radius+enemy.radius) * (x.radius+enemy.radius);
+		boolean collision = sqDist <= (x.radius + enemy.radius) * (x.radius + enemy.radius);
 		if (collision) {
 			Vector2 vecDirection = enemy.getEnemyBody().getPosition().sub(x.getCannonBallBody().getPosition()).nor();
 			x.setCollisionDirection(vecDirection);
@@ -220,7 +223,7 @@ public class Defender extends ApplicationAdapter {
 	}
 
 	@Override
-	public void dispose () {
+	public void dispose() {
 		world.dispose();
 		debugRenderer.dispose();
 	}
@@ -240,7 +243,7 @@ public class Defender extends ApplicationAdapter {
 	}
 
 	private Vector2 getMousePosInGameWorld(float x, float y) {
-		Vector3 vec3 = camera.unproject(new Vector3(x, y,0));
-		return new Vector2(vec3.x,vec3.y);
+		Vector3 vec3 = camera.unproject(new Vector3(x, y, 0));
+		return new Vector2(vec3.x, vec3.y);
 	}
 }
