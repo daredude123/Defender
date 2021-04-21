@@ -3,18 +3,14 @@ package com.andynordevelop.defender;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -37,7 +33,7 @@ public class Defender extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		world = new World(new Vector2(0, -10), true);
+		world = new World(new Vector2(0, -0), true);
 		camera = new OrthographicCamera(worldWidth, worldHeight);
 		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
@@ -72,7 +68,7 @@ public class Defender extends ApplicationAdapter {
 				cannonBall.initbody(world, -23f, 0f, 0.5f, 2);
 
 				long currentTime = System.nanoTime();
-				long measuredTime = (currentTime - startTime)/10000000;
+				long measuredTime = (currentTime - startTime)/1999999;
 
 				Vector2 bodyposition = new Vector2(player.getPosition());
 				Vector2 userTouch = getMousePosInGameWorld(x, y);
@@ -100,25 +96,10 @@ public class Defender extends ApplicationAdapter {
 		});
 	}
 
-//	private void initBackground() {
-//		ShapeRenderer shapeRenderer = new ShapeRenderer();
-//		shapeRenderer.setProjectionMatrix(camera.projection);
-//		for (int i = -worldWidth; i < worldWidth; i++) {
-//			for (int y = -worldHeight; y < worldHeight; y++) {
-//				shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//				shapeRenderer.setColor(8/255f, 48/255f, 46/255f, 1f);
-//				shapeRenderer.rect(i*50,y*50,13f,13f);
-//				shapeRenderer.end();
-//			}
-//		}
-//	}
-
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-//		initBackground();
 
 		debugRenderer.render(world, camera.combined);
 		timer += 1 * Gdx.graphics.getDeltaTime();
