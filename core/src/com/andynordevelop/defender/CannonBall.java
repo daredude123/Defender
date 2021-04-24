@@ -8,8 +8,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class CannonBall {
+public class CannonBall extends Actor {
+    long aliveTime;
     Sprite sprite;
     Texture texture;
     Body cannonBallBody;
@@ -20,6 +22,7 @@ public class CannonBall {
     private Vector2 collisionDirection;
 
     public void initbody(World world, float startPosX, float startPosY, float radius, float density) {
+        aliveTime = System.currentTimeMillis();
         this.world = world;
         cannonBallBodyDef = new BodyDef();
         cannonBallBodyDef.type = cannonBallBodyType;
@@ -35,14 +38,19 @@ public class CannonBall {
 
         texture = new Texture("cannonball.png");
         sprite = new Sprite(texture);
-        sprite.setPosition(cannonBallBody.getPosition().x-1f,cannonBallBody.getPosition().y-10f);
-        sprite.setSize(1.5f,1.5f);
-//        sprite.setRotation(20f);
+        sprite.setPosition(cannonBallBody.getPosition().x - 1f, cannonBallBody.getPosition().y - 10f);
+        sprite.setSize(1.5f, 1.5f);
+        sprite.setColor(64f, 89f, 143f, 1f);
     }
+
     public void update() {
         sprite.setPosition(getPosition().x-0.75f,getPosition().y-0.75f);
         sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
         sprite.rotate(cannonBallBody.getAngle() * MathUtils.radiansToDegrees);
+    }
+
+    public long checkAliveTime() {
+        return System.currentTimeMillis() - aliveTime;
     }
 
     public void destroyCannonBall() {
