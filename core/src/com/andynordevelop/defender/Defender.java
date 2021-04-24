@@ -138,6 +138,8 @@ public class Defender extends ApplicationAdapter {
 				cannonBallListToRemove.add(x);
 			} else if (x.cannonBallBody.getPosition().x + x.radius > worldWidth || x.cannonBallBody.getPosition().x - x.radius < -worldHeight) {
 				cannonBallListToRemove.add(x);
+			} else if (x.checkAliveTime() / 1000 > 10) {
+				cannonBallListToRemove.add(x);
 			}
 			for (Enemy enemy : enemyList) {
 				if (checkForCannonBallHit(x, enemy)) {
@@ -147,7 +149,7 @@ public class Defender extends ApplicationAdapter {
 			}
 		}
 		for (Shrapnel x : shrapnelList) {
-			if (x.checkAliveTime() / 1000 > ThreadLocalRandom.current().nextInt(5,9)) {
+			if (x.checkAliveTime() / 1000 > ThreadLocalRandom.current().nextInt(5,20)) {
 				shrapnelListToRemove.add(x);
 			} else if (x.getShrapnelBody().getPosition().y > worldHeight || x.getShrapnelBody().getPosition().y < -worldHeight) {
 				shrapnelListToRemove.add(x);
