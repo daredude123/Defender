@@ -1,6 +1,8 @@
 package com.andynordevelop.defender;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -9,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class CannonBall {
     Sprite sprite;
+    Texture texture;
     Body cannonBallBody;
     BodyDef cannonBallBodyDef;
     final BodyDef.BodyType cannonBallBodyType = BodyDef.BodyType.DynamicBody;
@@ -29,6 +32,17 @@ public class CannonBall {
         cannonBallBody.createFixture(circleShape, density).setRestitution(0.5f);
         cannonBallBody.setTransform(startPosX, startPosY, 0);
         circleShape.dispose();
+
+        texture = new Texture("cannonball.png");
+        sprite = new Sprite(texture);
+        sprite.setPosition(cannonBallBody.getPosition().x-1f,cannonBallBody.getPosition().y-10f);
+        sprite.setSize(1.5f,1.5f);
+//        sprite.setRotation(20f);
+    }
+    public void update() {
+        sprite.setPosition(getPosition().x-0.75f,getPosition().y-0.75f);
+        sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
+        sprite.rotate(cannonBallBody.getAngle() * MathUtils.radiansToDegrees);
     }
 
     public void destroyCannonBall() {

@@ -14,6 +14,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -38,6 +40,7 @@ public class Defender extends ApplicationAdapter {
 		world = new World(new Vector2(0, -0), true);
 		camera = new OrthographicCamera(worldWidth, worldHeight);
 		spriteBatch = new SpriteBatch();
+		spriteBatch.setProjectionMatrix(camera.projection);
 		//vi har denne på for øyeblikket.
 		debugRenderer = new Box2DDebugRenderer();
 		enemyList = new ArrayList<>();
@@ -49,6 +52,7 @@ public class Defender extends ApplicationAdapter {
 		timer = 0;
 		initPlayer();
 		spawnEnemy();
+
 
 		// ground
 		createEdge(BodyDef.BodyType.StaticBody, -25, -12.5f, 25, -12.5f, 5);
@@ -68,7 +72,7 @@ public class Defender extends ApplicationAdapter {
 			public boolean touchUp(int x, int y, int pointer, int button) {
 
 				CannonBall cannonBall = new CannonBall();
-				cannonBall.initbody(world, -23f, 0f, 0.5f, 2);
+				cannonBall.initbody(world, -23f, 0f, 0.6f, 2);
 
 				long currentTime = System.nanoTime();
 				long measuredTime = (currentTime - startTime) / 1999999;
@@ -101,13 +105,33 @@ public class Defender extends ApplicationAdapter {
 
 	@Override
 	public void render() {
+		physicsUpdate();
+		moveEnemies();
+		world.step(1 / 60f, 10, 2);
+
 		Gdx.gl.glClearColor(.125f, .125f, .125f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		debugRenderer.render(world, camera.combined);
 		timer += 1 * Gdx.graphics.getDeltaTime();
-		world.step(1 / 60f, 10, 2);
 
+		spriteBatch.begin();
+		for (CannonBall x : cannonBallList) {
+			x.update();
+			x.sprite.draw(spriteBatch);
+		}
+		spriteBatch.end();
+
+		if (timer >= 1) {
+			spawnEnemy();
+			timer = 0;
+		}
+		cleanCannonBalls();
+		cleanEnemies();
+		cleanShrapnels();
+	}
+
+	private void physicsUpdate() {
 		for (CannonBall x : cannonBallList) {
 			if (x.cannonBallBody.getPosition().y + x.radius > worldHeight || x.cannonBallBody.getPosition().y - x.radius < -worldHeight) {
 				cannonBallListToRemove.add(x);
@@ -121,7 +145,6 @@ public class Defender extends ApplicationAdapter {
 				}
 			}
 		}
-
 		for (Shrapnel x : shrapnelList) {
 			if (x.checkAliveTime() / 1000 > 3) {
 				shrapnelListToRemove.add(x);
@@ -132,15 +155,6 @@ public class Defender extends ApplicationAdapter {
 			}
 		}
 
-		if (timer >= 1) {
-			spawnEnemy();
-			timer = 0;
-		}
-
-		moveEnemies();
-		cleanCannonBalls();
-		cleanEnemies();
-		cleanShrapnels();
 	}
 
 	private void cleanShrapnels() {
