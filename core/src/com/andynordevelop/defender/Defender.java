@@ -18,6 +18,7 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Defender extends ApplicationAdapter {
 	SpriteBatch spriteBatch;
@@ -146,7 +147,7 @@ public class Defender extends ApplicationAdapter {
 			}
 		}
 		for (Shrapnel x : shrapnelList) {
-			if (x.checkAliveTime() / 1000 > 3) {
+			if (x.checkAliveTime() / 1000 > ThreadLocalRandom.current().nextInt(5,9)) {
 				shrapnelListToRemove.add(x);
 			} else if (x.getShrapnelBody().getPosition().y > worldHeight || x.getShrapnelBody().getPosition().y < -worldHeight) {
 				shrapnelListToRemove.add(x);
